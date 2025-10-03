@@ -48,9 +48,20 @@ app.post("/signup",async (req,res)=>{
         res.status(404).send("Error saving the user"+err.message);
     }
 });
-app.patch("/update",async (req,res)=>{
-    const {userId,updatedData}=req.body;
+app.patch("/update/:userId",async (req,res)=>{
+    const userId=req.params?.userId;
+    const {updatedData}=req.body;
     try{
+        const Update_Allowed=[
+            "age",
+            "skills",
+            "gender",
+            "about"
+        ];
+        const isAllowedUpdate=Object.keys(updatedData).every((k)=>Update_Allowed.includes(k));
+        if(!isAllowedUpdate){
+            res.status(400).send("not allowed to chnage")
+        }
         const updatedUser=await User.findByIdAndUpdate(userId,updatedData,{
             runValidators:true
         });
@@ -60,7 +71,7 @@ app.patch("/update",async (req,res)=>{
             res.status(404).send("user not found");
         }
     }catch(err){
-        res.status(400).send("somthing went wrong"+err);
+        res.status(400).send("somthing went wrong"+"   "+err.message);
     }
 });
 connectDB()

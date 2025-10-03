@@ -29,7 +29,12 @@ const userSchema = new mongoose.Schema({
         }
     },
     skills: {
-        type: [String]
+        type: [String],
+        validate(value){
+            if(value.length>5){
+                throw new Error("not allowed more than 5");
+            }
+        }
     },
     gender: {
         type: String,
