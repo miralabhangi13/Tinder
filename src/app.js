@@ -51,14 +51,16 @@ app.post("/signup",async (req,res)=>{
 app.patch("/update",async (req,res)=>{
     const {userId,updatedData}=req.body;
     try{
-        const updatedUser=await User.findByIdAndUpdate(userId,updatedData);
-        if(updatedUser){ 
+        const updatedUser=await User.findByIdAndUpdate(userId,updatedData,{
+            runValidators:true
+        });
+        if(updatedUser){
             res.status(200).send("user updeted sucsfully");
         }else{
             res.status(404).send("user not found");
         }
     }catch(err){
-        res.status(400).send("somthing went wrong");
+        res.status(400).send("somthing went wrong"+err);
     }
 });
 connectDB()
