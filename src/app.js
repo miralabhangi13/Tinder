@@ -3,6 +3,8 @@ const app=express();
 const {connectDB}=require("./config/database")
 const User=require("./models/user");
 const user = require("./models/user");
+const {validateSingup}=require("./utils/validations")
+const bcrypt=require("bcrypt");
 app.use(express.json());
 app.get("/user",async (req,res)=>{
     const userEmail=req.body.email;
@@ -40,12 +42,22 @@ app.delete("/delete",async (req,res)=>{
     }
 });
 app.post("/signup",async (req,res)=>{
-    const user=new User(req.body);
     try{
+        validateSingup(req);
+        const {firstName,lastName,email,gender,age,passWord}=req.body;
+        const passWordHash=await bcrypt.hash(passWord,10);
+        const user=new User({
+            firstName,
+            lastName,
+            age,
+            email,
+            passWord:passWordHash,
+            gender
+        });
         await user.save();
         res.send("User Added succuesfully");
     }catch(err){
-        res.status(404).send("Error saving the user"+err.message);
+        res.status(404).send("Error:"+err.message);
     }
 });
 app.patch("/update/:userId",async (req,res)=>{
